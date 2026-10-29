@@ -1,0 +1,36 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Output media files & uploaded user footage
+output/
+uploads/
+*.mp4
+*.mp3
+*.wav
+*.png
+!templates/
+!assets/
+
+# Logs & temp
+*.log
+.pytest_cache/
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ViralShorts AI Studio | Reddit to YouTube Shorts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              orange: '#FF4500',
+              red: '#FF1A53',
+              purple: '#8B5CF6',
+              dark: '#0B0F17',
+              card: '#121824',
+              border: 'rgba(255, 255, 255, 0.08)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #080B11;
+      color: #E2E8F0;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(18, 24, 36, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    .glow-border:focus-within {
+      box-shadow: 0 0 20px rgba(255, 69, 0, 0.25);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-orange-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-brand-border bg-[#0B0F17]/80 backdrop-blur-xl sticky top-0 z-40 px-6 py-4">
+    <div class="max-w-[1700px] mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-orange to-brand-red flex items-center justify-center shadow-lg shadow-orange-500/30">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+              ViralShorts AI Studio
+            </h1>
+            <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+              v2.0 Web UI
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-medium">Reddit Scraper ➔ Gemini 1.5 ➔ Playwright ➔ Edge-TTS ➔ FFmpeg</p>
+        </div>
+      </div>
+
+      <!-- Action items -->
+      <div class="flex items-center gap-4">
+        <div id="api-status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>API Keys: Đang kiểm tra...</span>
+        </div>
+
+        <button onclick="openSettingsModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 transition-all flex items-center gap-2 shadow-sm">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Cấu hình API Keys
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-[1700px] w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT PANEL: Controls (Col 1-4) -->
+    <section class="lg:col-span-4 flex flex-col gap-5">
+      <div class="bg-brand-card/90 border border-brand-border rounded-3xl p-6 shadow-2xl backdrop-blur-md flex flex-col gap-5">
+        <div class="flex items-center justify-between border-b border-brand-border pb-4">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
+            Thông Số Tạo Video
+          </h2>
+          <span class="text-xs text-slate-400">Tỉ lệ 9:16 (Shorts)</span>
+        </div>
+
+        <!-- Subreddit selection -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-300">Subreddit Target</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-3 text-slate-500 font-mono text-sm">r/</span>
+            <input type="text" id="subreddit-input" value="AskReddit" placeholder="e.g. AskReddit"
+              class="w-full bg-[#080B11] border border-slate-700/80 rounded-2xl pl-9 pr-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-brand-orange glow-border transition-all">
+          </div>
+          <!-- Quick Subreddit Pills -->
+          <div class="flex flex-wrap gap-1.5 mt-1">
+            <button onclick="setSubreddit('AskReddit')" class="px-2.5 py-1 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-all">r/AskReddit</button>
+            <button onclick="setSubreddit('UnethicalLifeProTips')" class="px-2.5 py-1 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-all">r/UnethicalLifeProTips</button>
+            <button onclick="setSubreddit('Showerthoughts')" class="px-2.5 py-1 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-all">r/Showerthoughts</button>
+            <button onclick="setSubreddit('confession')" class="px-2.5 py-1 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-all">r/confession</button>
+          </div>
+        </div>
+
+        <!-- Time Filter -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-300">Khung Thời Gian Reddit</label>
+          <select id="time-filter-select" class="w-full bg-[#080B11] border border-slate-700/80 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-brand-orange transition-all">
+            <option value="day" selected>Top Ngày (Hôm nay)</option>
+            <option value="week">Top Tuần</option>
+            <option value="month">Top Tháng</option>
+            <option value="all">Top Mọi Thời Đại (All-time)</option>
+          </select>
+        </div>
+
+        <!-- Voice Selection -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-300">Giọng Đọc AI (Edge-TTS)</label>
+          <select id="voice-select" class="w-full bg-[#080B11] border border-slate-700/80 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-brand-orange transition-all">
+            <option value="en-US-ChristopherNeural" selected>🇺🇸 Christopher (Nam - Trầm ấm, Viral Story)</option>
+            <option value="en-US-GuyNeural">🇺🇸 Guy (Nam - Tự nhiên, Hài hước)</option>
+            <option value="en-US-JennyNeural">🇺🇸 Jenny (Nữ - Truyền cảm, Năng động)</option>
+            <option value="en-US-AndrewMultilingualNeural">🇺🇸 Andrew (Nam - Trẻ trung, Rõ nét)</option>
+            <option value="en-US-AvaMultilingualNeural">🇺🇸 Ava (Nữ - Hiện đại, Tự tin)</option>
+            <option value="en-GB-RyanNeural">🇬🇧 Ryan (Nam - Anh Quốc, Kể chuyện)</option>
+            <option value="vi-VN-NamMinhNeural">🇻🇳 Nam Minh (Nam - Giọng Việt)</option>
+            <option value="vi-VN-HoaiMyNeural">🇻🇳 Hoài My (Nữ - Giọng Việt)</option>
+          </select>
+        </div>
+
+        <!-- Background Video Source -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-300">Video Nền (Background Gameplay)</label>
+          <div class="flex flex-col gap-2">
+            <select id="bg-choice-select" onchange="toggleBgUploadUI()" class="w-full bg-[#080B11] border border-slate-700/80 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-brand-orange transition-all">
+              <option value="default">✨ Ambient Gradient (Tự Động Sinh)</option>
+              <option value="custom">📁 Tải Lên Video Gameplay Của Tôi (.mp4)</option>
+            </select>
+            <div id="bg-upload-container" class="hidden mt-1">
+              <input type="file" id="bg-video-file" accept="video/mp4" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Buttons -->
+        <div class="flex flex-col gap-2.5 pt-3 border-t border-brand-border">
+          <button id="btn-generate-full" onclick="startFullPipeline()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold text-sm shadow-lg shadow-orange-600/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+            <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Tạo Full Tự Động (One-Click)
+          </button>
+
+          <button id="btn-step-1" onclick="fetchAndPreviewContent()" class="w-full py-2.5 px-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            Chỉ Lấy & Soát Nội Dung (Step 1)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: Content Inspector & Card Gallery (Col 5-8) -->
+    <section class="lg:col-span-5 flex flex-col gap-5">
+      <div class="bg-brand-card/90 border border-brand-border rounded-3xl p-6 shadow-2xl backdrop-blur-md flex flex-col h-[780px]">
+        
+        <!-- Header with Tabs -->
+        <div class="flex items-center justify-between border-b border-brand-border pb-4 mb-4">
+          <div class="flex items-center gap-2">
+            <button id="tab-btn-content" onclick="switchCenterTab('content')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20">
+              📝 Kịch Bản Đã Lọc
+            </button>
+            <button id="tab-btn-cards" onclick="switchCenterTab('cards')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all">
+              🖼️ Ảnh Card PNG (<span id="cards-count-badge">0</span>)
+            </button>
+          </div>
+          <div id="virality-score-badge" class="hidden items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            🔥 Virality Score: <span id="virality-val">8</span>/10
+          </div>
+        </div>
+
+        <!-- TAB 1: Content Editor -->
+        <div id="tab-pane-content" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 pr-1">
+          <div id="content-empty-state" class="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500">
+            <div class="w-16 h-16 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-3">
+              <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-slate-400">Chưa có dữ liệu bài viết</p>
+            <p class="text-xs text-slate-500 max-w-xs mt-1">Bấm "Tạo Full Tự Động" hoặc "Chỉ Lấy & Soát Nội Dung" để cào bài top Reddit và phân tích bằng Gemini.</p>
+          </div>
+
+          <div id="content-editor-container" class="hidden flex-col gap-4">
+            <!-- Title Box -->
+            <div class="bg-[#080B11] border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                  Tiêu Đề Spoken Hook (TTS)
+                </span>
+                <span id="post-author-tag" class="text-[11px] text-slate-500 font-mono">u/...</span>
+              </div>
+              <textarea id="edit-title-tts" rows="2" class="w-full bg-slate-900/60 border border-slate-700/60 rounded-xl p-2.5 text-xs font-semibold text-slate-100 focus:outline-none focus:border-brand-orange resize-none"></textarea>
+            </div>
+
+            <!-- 4 Comments Container -->
+            <div id="comments-list-box" class="flex flex-col gap-3">
+              <!-- Dynamically populated via JS -->
+            </div>
+
+            <div class="sticky bottom-0 pt-2 pb-1 bg-gradient-to-t from-brand-card to-transparent">
+              <button onclick="renderFromCurrentContent()" class="w-full py-2.5 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
+                Xác Nhận Nội Dung & Biên Tập Video Này
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Rendered Cards Gallery -->
+        <div id="tab-pane-cards" class="hidden flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3 pr-1">
+          <div id="cards-empty-state" class="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500">
+            <p class="text-xs">Chưa có ảnh card PNG nào được render.</p>
+          </div>
+          <div id="cards-grid" class="hidden grid grid-cols-1 gap-4">
+            <!-- Cards populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Live Console & Final Video (Col 9-12) -->
+    <section class="lg:col-span-3 flex flex-col gap-5">
+      
+      <!-- Video Player Card -->
+      <div class="bg-brand-card/90 border border-brand-border rounded-3xl p-5 shadow-2xl backdrop-blur-md flex flex-col items-center justify-center min-h-[380px]">
+        <div class="w-full flex items-center justify-between border-b border-brand-border pb-3 mb-3">
+          <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+            Final YouTube Short (9:16)
+          </h3>
+          <span id="video-status-indicator" class="text-[10px] text-slate-400 font-medium">Chờ tạo...</span>
+        </div>
+
+        <div id="video-preview-wrapper" class="relative w-[190px] h-[338px] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex items-center justify-center">
+          <div id="video-placeholder" class="text-center p-3 text-slate-600">
+            <svg class="w-10 h-10 mx-auto mb-2 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-[11px] font-semibold text-slate-500">Video hiển thị tại đây</span>
+          </div>
+          <video id="final-video-player" controls loop playsinline class="hidden w-full h-full object-cover rounded-2xl"></video>
+        </div>
+
+        <!-- Download Action -->
+        <a id="btn-download-video" href="#" download class="hidden w-full mt-3 py-2 px-3 text-center rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all">
+          ⬇️ Tải Xuống Video (.mp4)
+        </a>
+      </div>
+
+      <!-- Realtime Progress Bar & Console -->
+      <div class="bg-brand-card/90 border border-brand-border rounded-3xl p-5 shadow-2xl backdrop-blur-md flex flex-col flex-1 min-h-[350px]">
+        <div class="flex items-center justify-between border-b border-brand-border pb-3 mb-3">
+          <span class="text-xs font-bold text-white flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+              <span id="ping-indicator" class="hidden animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-slate-500" id="dot-indicator"></span>
+            </span>
+            Tiến Độ & Terminal Log
+          </span>
+          <span id="progress-percent" class="text-xs font-mono font-bold text-orange-400">0%</span>
+        </div>
+
+        <!-- Progress bar track -->
+        <div class="w-full bg-[#080B11] h-2 rounded-full overflow-hidden border border-slate-800 mb-3">
+          <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-300 w-0"></div>
+        </div>
+        <p id="progress-stage-text" class="text-[11px] text-slate-400 mb-2 font-medium truncate">Sẵn sàng thực thi...</p>
+
+        <!-- Terminal log box -->
+        <div id="terminal-log-box" class="flex-1 bg-[#05070B] border border-slate-800/90 rounded-2xl p-3 font-mono text-[11px] leading-relaxed text-slate-300 overflow-y-auto custom-scrollbar select-text">
+          <span class="text-slate-600">// Khởi tạo hệ thống ViralShorts AI Engine...</span><br>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Settings Modal (API Keys) -->
+  <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-brand-border pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          🔑 Cài Đặt API Keys (.env)
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3 text-xs">
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Reddit Client ID</label>
+          <input type="text" id="cfg-reddit-id" placeholder="VD: pA3k...9Q" class="w-full bg-[#080B11] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-brand-orange">
+        </div>
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Reddit Client Secret</label>
+          <input type="password" id="cfg-reddit-secret" placeholder="VD: abcd1234..." class="w-full bg-[#080B11] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-brand-orange">
+        </div>
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Google Gemini API Key</label>
+          <input type="password" id="cfg-gemini-key" placeholder="AIzaSy..." class="w-full bg-[#080B11] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-brand-orange">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-brand-border">
+        <button onclick="closeSettingsModal()" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Hủy</button>
+        <button onclick="saveApiKeys()" class="px-4 py-2 rounded-xl text-xs font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-md">Lưu Cấu Hình</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentPost = null;
+    let currentProcessed = null;
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      checkApiStatus();
+    });
+
+    function setSubreddit(name) {
+      document.getElementById('subreddit-input').value = name;
+    }
+
+    function toggleBgUploadUI() {
+      const choice = document.getElementById('bg-choice-select').value;
+      const uploadBox = document.getElementById('bg-upload-container');
+      if (choice === 'custom') {
+        uploadBox.classList.remove('hidden');
+      } else {
+        uploadBox.classList.add('hidden');
+      }
+    }
+
+    function switchCenterTab(tab) {
+      const paneContent = document.getElementById('tab-pane-content');
+      const paneCards = document.getElementById('tab-pane-cards');
+      const btnContent = document.getElementById('tab-btn-content');
+      const btnCards = document.getElementById('tab-btn-cards');
+
+      if (tab === 'content') {
+        paneContent.classList.remove('hidden');
+        paneCards.classList.add('hidden');
+        btnContent.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20';
+        btnCards.className = 'px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all';
+      } else {
+        paneContent.classList.add('hidden');
+        paneCards.classList.remove('hidden');
+        btnCards.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20';
+        btnContent.className = 'px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all';
+      }
+    }
+
+    function logToTerminal(message, type = 'info') {
+      const box = document.getElementById('terminal-log-box');
+      const time = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+      let colorClass = 'text-slate-300';
+      if (type === 'error') colorClass = 'text-red-400 font-bold';
+      if (type === 'success') colorClass = 'text-emerald-400 font-bold';
+      if (type === 'stage') colorClass = 'text-orange-400 font-bold';
+
+      const line = document.createElement('div');
+      line.className = `py-0.5 ${colorClass}`;
+      line.innerHTML = `<span class="text-slate-600">[${time}]</span> ${message}`;
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function updateProgress(percent, stageText) {
+      document.getElementById('progress-percent').innerText = `${percent}%`;
+      document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+      if (stageText) {
+        document.getElementById('progress-stage-text').innerText = stageText;
+      }
+    }
+
+    function setRunningState(isRunning) {
+      const ping = document.getElementById('ping-indicator');
+      const dot = document.getElementById('dot-indicator');
+      const btnFull = document.getElementById('btn-generate-full');
+      const btnStep1 = document.getElementById('btn-step-1');
+
+      if (isRunning) {
+        ping.classList.remove('hidden');
+        dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-400';
+        btnFull.disabled = true;
+        btnStep1.disabled = true;
+        btnFull.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        ping.classList.add('hidden');
+        dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-slate-500';
+        btnFull.disabled = false;
+        btnStep1.disabled = false;
+        btnFull.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    async function checkApiStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        const badge = document.getElementById('api-status-badge');
+        if (data.configured) {
+          badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>API Keys: Đã sẵn sàng</span>`;
+        } else {
+          badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 cursor-pointer';
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span><span>Thiếu API Key (Bấm để nhập)</span>`;
+          badge.onclick = openSettingsModal;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    async function saveApiKeys() {
+      const reddit_id = document.getElementById('cfg-reddit-id').value.trim();
+      const reddit_secret = document.getElementById('cfg-reddit-secret').value.trim();
+      const gemini_key = document.getElementById('cfg-gemini-key').value.trim();
+
+      try {
+        const res = await fetch('/api/save-keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reddit_client_id: reddit_id,
+            reddit_client_secret: reddit_secret,
+            gemini_api_key: gemini_key
+          })
+        });
+        const d = await res.json();
+        if (d.success) {
+          logToTerminal('Đã lưu cấu hình API keys thành công!', 'success');
+          closeSettingsModal();
+          checkApiStatus();
+        } else {
+          alert('Lỗi: ' + d.error);
+        }
+      } catch (err) {
+        alert('Lỗi lưu keys: ' + err.message);
+      }
+    }
+
+    // Step 1: Scrape & Gemini only (For preview & edit)
+    async function fetchAndPreviewContent() {
+      const subreddit = document.getElementById('subreddit-input').value.trim() || 'AskReddit';
+      const timeFilter = document.getElementById('time-filter-select').value;
+
+      setRunningState(true);
+      updateProgress(15, `Đang cào bài top từ r/${subreddit}...`);
+      logToTerminal(`Bắt đầu cào top post từ r/${subreddit} (${timeFilter})...`, 'stage');
+
+      try {
+        const res = await fetch('/api/preview-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subreddit, time_filter: timeFilter })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Không thể cào dữ liệu');
+        }
+
+        const data = await res.json();
+        currentPost = data.post;
+        currentProcessed = data.processed;
+
+        updateProgress(50, 'Đã phân tích xong nội dung với Gemini!');
+        logToTerminal(`Gemini chấm điểm Virality: ${currentProcessed.topic_score}/10`, 'success');
+        renderContentEditor(currentPost, currentProcessed);
+
+      } catch (e) {
+        logToTerminal(`Lỗi Step 1: ${e.message}`, 'error');
+      } finally {
+        setRunningState(false);
+      }
+    }
+
+    function renderContentEditor(post, processed) {
+      document.getElementById('content-empty-state').classList.add('hidden');
+      const container = document.getElementById('content-editor-container');
+      container.classList.remove('hidden');
+
+      // Virality score badge
+      const scoreBadge = document.getElementById('virality-score-badge');
+      scoreBadge.classList.remove('hidden');
+      scoreBadge.classList.add('flex');
+      document.getElementById('virality-val').innerText = processed.topic_score;
+
+      // Title Hook
+      document.getElementById('post-author-tag').innerText = `u/${post.author} (Score: ${post.score})`;
+      document.getElementById('edit-title-tts').value = processed.selected_title_tts;
+
+      // 4 Comments
+      const list = document.getElementById('comments-list-box');
+      list.innerHTML = '';
+
+      processed.comments.forEach((c, i) => {
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'bg-[#080B11] border border-slate-800 rounded-2xl p-3.5 flex flex-col gap-2';
+        commentDiv.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-mono text-[10px]">${i+1}</span>
+              u/<input type="text" id="c-author-${i}" value="${c.original_author}" class="bg-transparent border-b border-slate-700 text-slate-200 text-xs font-semibold focus:outline-none w-28">
+            </span>
+            <input type="text" id="c-score-${i}" value="${c.score_display}" class="w-16 bg-slate-900 border border-slate-700/60 rounded-md px-1.5 py-0.5 text-[11px] font-mono text-center text-orange-400">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase font-bold text-slate-500">Hiển thị màn hình (Censored)</label>
+            <textarea id="c-display-${i}" rows="2" class="w-full bg-slate-900/60 border border-slate-700/60 rounded-xl p-2 text-xs text-slate-200 focus:outline-none focus:border-brand-orange resize-none">${c.display_text}</textarea>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase font-bold text-slate-500">Giọng đọc TTS (Cleaned speech)</label>
+            <textarea id="c-tts-${i}" rows="2" class="w-full bg-slate-900/60 border border-slate-700/60 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-brand-orange resize-none">${c.cleaned_tts_text}</textarea>
+          </div>
+        `;
+        list.appendChild(commentDiv);
+      });
+
+      switchCenterTab('content');
+    }
+
+    // Step 2: Render & Compile from edited content
+    async function renderFromCurrentContent() {
+      if (!currentPost || !currentProcessed) {
+        alert('Chưa có nội dung bài viết!');
+        return;
+      }
+
+      // Collect user edits
+      currentProcessed.selected_title_tts = document.getElementById('edit-title-tts').value;
+      for (let i = 0; i < 4; i++) {
+        currentProcessed.comments[i].original_author = document.getElementById(`c-author-${i}`).value;
+        currentProcessed.comments[i].score_display = document.getElementById(`c-score-${i}`).value;
+        currentProcessed.comments[i].display_text = document.getElementById(`c-display-${i}`).value;
+        currentProcessed.comments[i].cleaned_tts_text = document.getElementById(`c-tts-${i}`).value;
+      }
+
+      await executeRenderPipeline(currentPost, currentProcessed);
+    }
+
+    // Full Automated Run
+    async function startFullPipeline() {
+      const subreddit = document.getElementById('subreddit-input').value.trim() || 'AskReddit';
+      const timeFilter = document.getElementById('time-filter-select').value;
+      const voice = document.getElementById('voice-select').value;
+
+      setRunningState(true);
+      updateProgress(5, 'Đang chuẩn bị tiến trình...');
+      logToTerminal(`🚀 BẮT ĐẦU PIPELINE TỰ ĐỘNG CHO r/${subreddit}...`, 'stage');
+
+      // Check for custom background upload
+      let customBgFilename = null;
+      const bgChoice = document.getElementById('bg-choice-select').value;
+      const fileInput = document.getElementById('bg-video-file');
+      if (bgChoice === 'custom' && fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        logToTerminal('Đang tải lên video gameplay nền...', 'info');
+        const uploadRes = await fetch('/api/upload-bg', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        customBgFilename = uploadData.filename;
+        logToTerminal(`Tải nền thành công: ${customBgFilename}`, 'success');
+      }
+
+      // Open SSE Stream for live execution logs
+      const url = `/api/generate-stream?subreddit=${encodeURIComponent(subreddit)}&time_filter=${timeFilter}&voice=${encodeURIComponent(voice)}&bg_video=${customBgFilename || ''}`;
+      
+      const evtSource = new EventSource(url);
+
+      evtSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'log') {
+            logToTerminal(data.message, data.level);
+          } else if (data.type === 'progress') {
+            updateProgress(data.percent, data.stage);
+          } else if (data.type === 'content_ready') {
+            currentPost = data.post;
+            currentProcessed = data.processed;
+            renderContentEditor(currentPost, currentProcessed);
+          } else if (data.type === 'cards_ready') {
+            renderCardsGallery(data.cards);
+          } else if (data.type === 'completed') {
+            updateProgress(100, 'Hoàn thành 100%!');
+            logToTerminal(`🎉 XUẤT BẢN THÀNH CÔNG: ${data.video_url}`, 'success');
+            displayFinalVideo(data.video_url);
+            setRunningState(false);
+            evtSource.close();
+          } else if (data.type === 'error') {
+            logToTerminal(`Lỗi: ${data.message}`, 'error');
+            setRunningState(false);
+            evtSource.close();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      evtSource.onerror = (e) => {
+        logToTerminal('Mất kết nối Server-Sent Events', 'error');
+        setRunningState(false);
+        evtSource.close();
+      };
+    }
+
+    // Render & compile from existing edited state
+    async function executeRenderPipeline(post, processed) {
+      const voice = document.getElementById('voice-select').value;
+      setRunningState(true);
+      updateProgress(50, 'Đang gửi dữ liệu chỉnh sửa để render...');
+      logToTerminal('Đang render Playwright cards và biên tập audio/video...', 'stage');
+
+      try {
+        const res = await fetch('/api/compile-edited', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            post: post,
+            processed: processed,
+            voice: voice,
+          })
+        });
+
+        const data = await res.json();
+        if (data.cards) renderCardsGallery(data.cards);
+        if (data.video_url) {
+          updateProgress(100, 'Video đã hoàn thành!');
+          logToTerminal(`Biên tập video thành công: ${data.video_url}`, 'success');
+          displayFinalVideo(data.video_url);
+        }
+      } catch (err) {
+        logToTerminal(`Lỗi render: ${err.message}`, 'error');
+      } finally {
+        setRunningState(false);
+      }
+    }
+
+    function renderCardsGallery(cards) {
+      const badge = document.getElementById('cards-count-badge');
+      const grid = document.getElementById('cards-grid');
+      const empty = document.getElementById('cards-empty-state');
+
+      badge.innerText = cards.length;
+      empty.classList.add('hidden');
+      grid.classList.remove('hidden');
+      grid.innerHTML = '';
+
+      cards.forEach((path, idx) => {
+        const item = document.createElement('div');
+        item.className = 'bg-[#080B11] border border-slate-800 rounded-2xl p-2.5 flex flex-col gap-2 shadow-lg';
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 px-1">
+            <span>${idx === 0 ? 'Card #0: Title Hook' : `Card #${idx}: Comment`}</span>
+            <a href="${path}" target="_blank" class="text-orange-400 hover:underline">Xem full PNG</a>
+          </div>
+          <div class="rounded-xl overflow-hidden bg-slate-900/60 p-2 flex items-center justify-center border border-slate-800">
+            <img src="${path}?t=${Date.now()}" alt="Card ${idx}" class="max-w-full h-auto rounded-lg">
+          </div>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    function displayFinalVideo(videoUrl) {
+      const placeholder = document.getElementById('video-placeholder');
+      const player = document.getElementById('final-video-player');
+      const downloadBtn = document.getElementById('btn-download-video');
+      const indicator = document.getElementById('video-status-indicator');
+
+      placeholder.classList.add('hidden');
+      player.classList.remove('hidden');
+      player.src = `${videoUrl}?t=${Date.now()}`;
+      player.load();
+      player.play().catch(() => {});
+
+      downloadBtn.classList.remove('hidden');
+      downloadBtn.href = videoUrl;
+      indicator.innerText = 'Sẵn sàng xem';
+      indicator.className = 'text-[10px] text-emerald-400 font-bold';
+    }
+  </script>
+</body>
+</html>
